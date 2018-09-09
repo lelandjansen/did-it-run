@@ -1,0 +1,30 @@
+language: rust
+sudo: required
+rust:
+  - stable
+  - beta
+  - nightly
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - cmake
+      - gcc
+      - binutils-dev
+      - libiberty-dev
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
+before_script:
+  - rustup install nightly
+  - rustup component add rustfmt-preview --toolchain nightly
+  - rustup component add clippy-preview --toolchain nightly
+script:
+  - cargo build --verbose --all
+  - cargo test --verbose --all
+  - ./check-style.sh
+after_success:
+  - ./.build-scripts/codecov.sh

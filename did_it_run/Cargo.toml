@@ -1,0 +1,14 @@
+[package]
+name = "did_it_run"
+version = "0.1.0"
+readme = "README.md"
+homepage = "https://www.didit.run"
+repository = "https://github.com/lelandjansen/did-it-run"
+license = "Apache-2.0"
+authors = ["Leland Jansen <lelandjansen@users.noreply.github.com>"]
+
+[dependencies]
+
+[[bin]]
+name = "diditrun"
+path = "src/bin/main.rs"
