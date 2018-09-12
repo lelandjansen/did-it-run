@@ -12,7 +12,13 @@ make
 make install DESTDIR=../../kcov-build
 cd ../..
 rm -rf kcov-master
-for file in target/debug/did_it_run-*[^\.d]; do
+files=$(find target/debug/deps \
+  -maxdepth 1 \
+  -type f \
+  -regextype grep \
+  -regex ".*-[0-9a-f]\{16\}" \
+  -executable);
+for file in $files; do
   mkdir -p "target/cov/$(basename $file)"
   ./kcov-build/usr/local/bin/kcov \
     --exclude-pattern=/.cargo,/usr/lib \

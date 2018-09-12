@@ -1,13 +1,19 @@
-pub fn add(a: i32, b: i32) -> i32 {
-    a + b
-}
+use std::ffi::OsStr;
+use std::io;
+use std::process::{Command, ExitStatus};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        assert_eq!(add(2, 2), 4);
+/// Executes `command` as a child process with the given `args`, waits for it to
+/// finish, then returns the exit status.
+///
+/// Stdout, stderr, and stdin are inherited by the parent.
+pub fn run_command<I, S>(command: S, args: I) -> io::Result<ExitStatus>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<OsStr>,
+{
+    let child = Command::new(command).args(args).spawn();
+    match child {
+        Ok(mut child) => child.wait(),
+        Err(err) => Err(err),
     }
 }

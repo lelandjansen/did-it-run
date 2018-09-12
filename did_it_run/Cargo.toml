@@ -11,4 +11,4 @@ authors = ["Leland Jansen <lelandjansen@users.noreply.github.com>"]
 
 [[bin]]
 name = "diditrun"
-path = "src/bin/main.rs"
+path = "src/main.rs"

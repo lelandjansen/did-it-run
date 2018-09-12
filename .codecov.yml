@@ -1,11 +1,12 @@
 codecov:
   notify:
     require_ci_to_pass: yes
+ignore:
+  - "did_it_run/src/main.rs"
 coverage:
   precision: 2
   round: down
   range: "80...100"
-
   status:
     project: yes
     patch: yes
