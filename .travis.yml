@@ -24,7 +24,7 @@ before_script:
   - rustup component add clippy-preview --toolchain nightly
 script:
   - cargo build --verbose --all
-  - cargo test --verbose --all
+  - ./test.sh
   - ./check-style.sh
 after_success:
   - ./.build-scripts/codecov.sh
