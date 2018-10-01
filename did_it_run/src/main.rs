@@ -1,14 +1,19 @@
-extern crate did_it_run;
+#[macro_use]
+extern crate clap;
+
+mod cli;
+mod incantation;
 
 use std::env;
 use std::process;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        return;
-    }
-    let status = did_it_run::run_command(&args[1], &args[2..]);
+    let result = cli::parse_arguments(env::args());
+    let incantation = match result {
+        Ok(incantation) => incantation,
+        Err(err) => err.exit(),
+    };
+    let status = incantation::run(incantation);
     match status {
         Ok(status) => {
             process::exit(match status.code() {

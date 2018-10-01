@@ -1,4 +1,4 @@
-# Did it run?
+# Did it Run?
 [![Build Status][ci-badge]][ci]
 [![Coverage][coverage-badge]][coverage]
 

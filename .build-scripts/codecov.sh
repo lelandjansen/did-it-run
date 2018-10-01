@@ -12,7 +12,7 @@ make
 make install DESTDIR=../../kcov-build
 cd ../..
 rm -rf kcov-master
-files=$(find target/debug/deps \
+files=$(find target/debug \
   -maxdepth 1 \
   -type f \
   -regextype grep \
