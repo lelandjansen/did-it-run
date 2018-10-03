@@ -1,5 +1,7 @@
 condense_wildcard_suffixes = true
 edition = "2018"
+error_on_line_overflow = true
+error_on_unformatted = true
 format_strings = true
 match_block_trailing_comma = true
 max_width = 80
@@ -8,7 +10,6 @@ normalize_comments = true
 reorder_impl_items = true
 report_fixme = "Unnumbered"
 report_todo = "Unnumbered"
-skip_children = true
 unstable_features = true
 use_try_shorthand = true
 wrap_comments = true
