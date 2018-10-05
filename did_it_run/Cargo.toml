@@ -8,6 +8,7 @@ license = "Apache-2.0"
 authors = ["Leland Jansen <lelandjansen@users.noreply.github.com>"]
 
 [dependencies]
+"clap" = "~2.32.0"
 
 [[bin]]
 name = "diditrun"
