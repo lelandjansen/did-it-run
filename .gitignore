@@ -4,6 +4,9 @@
 # rustfmt backup
 **/*.rs.bk
 
+# Coverage
+./kcov-*
+
 # Vim swap
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
@@ -27,3 +30,8 @@ tags
 # Codecov
 /kcov-master/
 *.tar.gz
+
+# TLS
+*.crt
+*.csr
+*.key

@@ -1,0 +1,6 @@
+version = "0.0.1"
+timeout_seconds = 10
+validate = true
+
+[email]
+recipients = ["someone@example.com"]

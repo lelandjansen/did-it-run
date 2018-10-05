@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # source: https://github.com/codecov/example-rust
 set -xe
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+cd "$DIR/.."
 wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz
 tar -xzf master.tar.gz
 rm master.tar.gz
