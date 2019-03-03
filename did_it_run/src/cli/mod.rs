@@ -2,7 +2,7 @@ extern crate clap;
 
 use clap::Arg;
 use incantation::Incantation;
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 
 const COMMAND: &str = "COMMAND";
 const ARGUMENTS: &str = "ARGUMENTS";
@@ -35,7 +35,7 @@ where
         .get_matches_from_safe(args)?;
     let command = matches.value_of_os(COMMAND).unwrap().to_os_string();
     let args = match matches.values_of_os(ARGUMENTS) {
-        Some(args) => args.map(|arg| arg.to_os_string()).collect(),
+        Some(args) => args.map(OsStr::to_os_string).collect(),
         None => vec![],
     };
     Ok(Incantation { command, args })
