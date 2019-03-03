@@ -5,7 +5,7 @@ readme = "README.md"
 homepage = "https://www.didit.run"
 repository = "https://github.com/lelandjansen/did-it-run"
 license = "Apache-2.0"
-authors = ["Leland Jansen <lelandjansen@users.noreply.github.com>"]
+authors = ["Leland Jansen <hello@lelandjansen.com>"]
 
 [dependencies]
 "clap" = "~2.32.0"
