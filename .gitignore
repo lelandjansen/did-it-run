@@ -1,7 +1,7 @@
 # Cargo
 /target/
 
-# rustfmt
+# rustfmt backup
 **/*.rs.bk
 
 # Vim swap
@@ -11,10 +11,19 @@
 [._]ss[a-gi-z]
 [._]sw[a-p]
 
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+
+# Auto-generated tag files
+tags
+
 # macOS
 .DS_Store
 
 # Codecov
 /kcov-master/
 *.tar.gz
-
