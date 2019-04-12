@@ -10,6 +10,7 @@ before_script:
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
+  - cargo install --force --path did_it_run
   - ./run-test-scripts.sh
 jobs:
   include:
