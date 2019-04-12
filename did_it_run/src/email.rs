@@ -1,7 +1,8 @@
-use config::Config;
-use duration_format::duration_format;
-use exit_code::{self, ExitCode};
-use incantation::Incantation;
+use crate::config::Config;
+use crate::duration_format::duration_format;
+use crate::exit_code::{self, ExitCode};
+use crate::incantation::Incantation;
+use crate::{DID_IT_RUN_EMAIL, DID_IT_RUN_NAME};
 use lettre::smtp::authentication::Mechanism;
 use lettre::smtp::client::net::{ClientTlsParameters, NetworkStream};
 use lettre::smtp::client::InnerClient;
@@ -14,13 +15,13 @@ use lettre::smtp::{ClientSecurity, SmtpClient, SmtpTransport};
 use lettre::{SendableEmail, Transport};
 use lettre_email::{self, EmailBuilder};
 use native_tls::{self, Protocol, TlsConnector};
+use serde_derive::Deserialize;
 use std::convert::From;
 use std::error;
 use std::fmt;
 use std::io;
 use std::net::ToSocketAddrs;
 use std::time::Duration;
-use {DID_IT_RUN_EMAIL, DID_IT_RUN_NAME};
 
 pub type Port = u16;
 
@@ -210,12 +211,15 @@ impl From<native_tls::Error> for MailerError {
 #[cfg(test)]
 mod test {
     use super::*;
-    use exit_code;
+    use crate::exit_code;
+    use crate::test::PROJECT_ROOT_PATH;
+    use lazy_static::lazy_static;
     use mailin_embedded::{
         self, AuthMechanism, AuthResult, DataResult, Server, SslConfig,
     };
     use mailparse;
     use mailparse::MailHeaderMap;
+    use matches::assert_matches;
     use std::io;
     use std::io::Write;
     use std::path::PathBuf;
@@ -223,7 +227,6 @@ mod test {
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::mpsc;
     use std::sync::mpsc::Sender;
-    use test::PROJECT_ROOT_PATH;
 
     const HOSTNAME: &str = "localhost";
     const USERNAME: &str = "username";

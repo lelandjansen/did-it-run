@@ -1,24 +1,3 @@
-#[macro_use]
-extern crate clap;
-extern crate dirs;
-#[macro_use]
-extern crate lazy_static;
-extern crate lettre;
-extern crate lettre_email;
-#[cfg(test)]
-extern crate mailin_embedded;
-#[cfg(test)]
-extern crate mailparse;
-#[cfg(test)]
-#[macro_use]
-extern crate matches;
-extern crate native_tls;
-extern crate semver;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate toml;
-
 mod cli;
 mod config;
 mod duration_format;
@@ -26,9 +5,9 @@ mod email;
 mod exit_code;
 mod incantation;
 
-use config::{DEFAULT_CONFIG_FILES, DEFAULT_CREDENTIALS_FILES};
-use email::{Mailer, NotificationInfo};
-use exit_code::ExitCode;
+use crate::config::{DEFAULT_CONFIG_FILES, DEFAULT_CREDENTIALS_FILES};
+use crate::email::{Mailer, NotificationInfo};
+use crate::exit_code::ExitCode;
 use std::env;
 use std::fmt::Display;
 use std::process;
@@ -98,6 +77,7 @@ fn main() {
 #[cfg(test)]
 mod test {
     use super::*;
+    use lazy_static::lazy_static;
     use std::ffi::OsString;
     use std::path::PathBuf;
 
