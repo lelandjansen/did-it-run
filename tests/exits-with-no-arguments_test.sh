@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-CONTAINER_TAG=$1
+BINARY_NAME=$1
 
-result="$(docker run \
-  --tty \
-  $CONTAINER_TAG:latest \
-  2>&1)"
+result=$("$BINARY_NAME" 2>&1)
 code=$?
 result="$(tr -dc \"[[:print:]]\" <<< $result)" # remove non-printable characters
 if [[ "$result" != *"required arguments were not provided"* ]]; then

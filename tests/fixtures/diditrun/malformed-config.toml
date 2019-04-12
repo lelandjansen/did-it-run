@@ -1,0 +1,6 @@
+version = "0.0.1"
+timeout = ten
+validate = nope
+
+[email]
+recipients = []

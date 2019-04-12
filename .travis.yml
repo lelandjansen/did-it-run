@@ -3,34 +3,36 @@ sudo: required
 rust:
   - stable
   - beta
-  - nightly
-addons:
-  apt:
-    packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - cmake
-      - gcc
-      - binutils-dev
-      - libiberty-dev
-matrix:
-  allow_failures:
-    - rust: nightly
-  fast_finish: true
+cache: cargo
 before_script:
-  # Fall back to an older nightly if the current version doesn't have rustfmt
-  # and clippy
-  - >
-    rustup install nightly &&
-    rustup component add rustfmt-preview --toolchain nightly &&
-    rustup component add clippy-preview --toolchain nightly ||
-      rustup install nightly-2019-02-26 &&
-      rustup component add rustfmt-preview --toolchain nightly-2019-02-26 &&
-      rustup component add clippy-preview --toolchain nightly-2019-02-26
+  - ./tests/fixtures/tls/make-cert.sh
+  - sudo ./tests/fixtures/tls/install-cert.sh
 script:
   - cargo build --verbose --all
-  - ./test.sh
-  - ./check-style.sh
-after_success:
-  - ./.build-scripts/codecov.sh
+  - cargo test --verbose --all
+  - ./run-test-scripts.sh
+jobs:
+  include:
+    - stage: style and coverage
+      rust: nightly
+      cache: cargo
+      addons:
+        apt:
+          packages:
+            - libcurl4-openssl-dev
+            - libelf-dev
+            - libdw-dev
+            - cmake
+            - gcc
+            - binutils-dev
+            - libiberty-dev
+      before_script:
+        - ./tests/fixtures/tls/make-cert.sh
+        - sudo ./tests/fixtures/tls/install-cert.sh
+        - rustup component add rustfmt-preview
+        - rustup component add clippy-preview
+      script:
+        - cargo test --verbose --all --no-run
+        - ./check-style.sh
+      after_success:
+        - ./.build-scripts/codecov.sh
