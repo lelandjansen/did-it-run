@@ -6,7 +6,7 @@ use std::io;
 use std::process::{Command, ExitStatus};
 use std::time::{Duration, Instant};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Incantation {
     pub command: OsString,
     pub args: Vec<OsString>,

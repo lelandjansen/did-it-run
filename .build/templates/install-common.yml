@@ -1,10 +1,17 @@
 steps:
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y \
+      libssl-dev \
+      libnotify-dev
+  displayName: Install dependencies (Linux)
+  condition: eq(variables['Agent.OS'], 'Linux')
 # TODO(#27): Find a cleaner way to install OpenSSL on Windows.
 - script: |
     curl -L -o OpenSSL-Win64.zip https://diditrun.blob.core.windows.net/did-it-run-dev/OpenSSL-Win64.zip
     unzip OpenSSL-Win64.zip -d C:\
     echo ##vso[task.setvariable variable=OPENSSL_DIR;]C:\OpenSSL-Win64
-  displayName: Install OpenSSL (Windows)
+  displayName: Install dependencies (Windows)
   condition: eq(variables['Agent.OS'], 'Windows_NT')
 - script: |
     ./tests/fixtures/tls/make-cert.sh

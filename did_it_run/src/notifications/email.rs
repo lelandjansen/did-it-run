@@ -1,7 +1,5 @@
 use crate::config::Config;
-use crate::duration_format::duration_format;
-use crate::exit_code::{self, ExitCode};
-use crate::incantation::Incantation;
+use crate::notifications::{Dispatcher, NotificationInfo, NotifierError};
 use crate::{DID_IT_RUN_EMAIL, DID_IT_RUN_NAME};
 use lettre::smtp::authentication::Mechanism;
 use lettre::smtp::client::net::{ClientTlsParameters, NetworkStream};
@@ -10,9 +8,8 @@ use lettre::smtp::commands::{
     AuthCommand, EhloCommand, QuitCommand, StarttlsCommand,
 };
 use lettre::smtp::extension::ClientId;
-use lettre::smtp::response::Response as SmtpResponse;
 use lettre::smtp::{ClientSecurity, SmtpClient, SmtpTransport};
-use lettre::{SendableEmail, Transport};
+use lettre::Transport;
 use lettre_email::{self, EmailBuilder};
 use native_tls::{self, Protocol, TlsConnector};
 use serde_derive::Deserialize;
@@ -21,7 +18,6 @@ use std::error;
 use std::fmt;
 use std::io;
 use std::net::ToSocketAddrs;
-use std::time::Duration;
 
 pub type Port = u16;
 
@@ -41,13 +37,6 @@ pub struct SmtpCredentials {
     password: String,
 }
 
-#[derive(Debug)]
-pub struct NotificationInfo {
-    pub incantation: Incantation,
-    pub exit_code: ExitCode,
-    pub elapsed_time: Duration,
-}
-
 pub struct Mailer {
     mailer: SmtpTransport,
     config: EmailConfig,
@@ -57,6 +46,7 @@ pub struct Mailer {
 pub enum MailerError {
     Io(io::Error),
     LettreEmail(lettre_email::error::Error),
+    MissingCredentials,
     NoEmailConfig,
     SmtpError(lettre::smtp::error::Error),
     Tls(native_tls::Error),
@@ -87,7 +77,7 @@ impl Mailer {
             let ehlo_command = EhloCommand::new(ClientId::hostname());
             let auth_command = AuthCommand::new(
                 AUTHENTICATION_MECHANISM,
-                smtp_credentials.to_owned(),
+                smtp_credentials.clone(),
                 None,
             )?;
             let mut client: InnerClient<NetworkStream> = InnerClient::new();
@@ -110,72 +100,47 @@ impl Mailer {
             config: email_config,
         })
     }
+}
 
-    pub fn notify(
+impl Dispatcher for Mailer {
+    fn dispatch_notification(
         &mut self,
-        info: &NotificationInfo,
-    ) -> Result<SmtpResponse, MailerError> {
-        let command = info.incantation.command.to_string_lossy();
-        let subject = if info.exit_code == exit_code::SUCCESS {
-            format!("`{}` succeeded", command)
-        } else {
-            format!("`{}` failed", command)
-        };
-        let html_body = if info.exit_code == exit_code::SUCCESS {
-            format!(
-                "<code>{}</code> succeeded in {}.",
-                info.incantation,
-                duration_format(&info.elapsed_time)
-            )
-        } else {
-            format!(
-                "<code>{}</code> failed with exit code {} in {}.",
-                info.incantation,
-                info.exit_code,
-                duration_format(&info.elapsed_time)
-            )
-        };
-        let plaintext_body = if info.exit_code == exit_code::SUCCESS {
-            format!(
-                "`{}` succeeded in {}.",
-                info.incantation,
-                duration_format(&info.elapsed_time)
-            )
-        } else {
-            format!(
-                "`{}` failed with exit code {} in {}.",
-                info.incantation,
-                info.exit_code,
-                duration_format(&info.elapsed_time)
-            )
-        };
+        info: NotificationInfo,
+    ) -> Result<(), NotifierError> {
+        let subject = info.brief;
+        let html_body = info.html_details;
+        let plaintext_body = info.details;
         let mut builder = EmailBuilder::new()
             .from((DID_IT_RUN_EMAIL, DID_IT_RUN_NAME))
             .subject(subject)
             .alternative(html_body, plaintext_body);
         for recipient in &self.config.recipients {
-            builder = builder.to(recipient.to_owned());
+            builder = builder.to(recipient.clone());
         }
-        let email: SendableEmail = builder.build()?.into();
-        self.mailer.send(email).map_err(MailerError::SmtpError)
-    }
-}
-
-impl fmt::Display for MailerError {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            MailerError::NoEmailConfig => {
-                write!(formatter, "No email config provided.")
-            },
-            MailerError::Tls(ref err) => err.fmt(formatter),
-            MailerError::LettreEmail(ref err) => err.fmt(formatter),
-            MailerError::SmtpError(ref err) => err.fmt(formatter),
-            MailerError::Io(ref err) => write!(formatter, "IO error: {}", err),
-        }
+        let email = builder.build().map_err(MailerError::LettreEmail)?.into();
+        self.mailer.send(email).map_err(MailerError::SmtpError)?;
+        Ok(())
     }
 }
 
 impl error::Error for MailerError {}
+
+impl fmt::Display for MailerError {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            MailerError::Io(ref err) => write!(formatter, "IO error: {}", err),
+            MailerError::LettreEmail(ref err) => err.fmt(formatter),
+            MailerError::MissingCredentials => {
+                write!(formatter, "No smtp credentials provided.")
+            },
+            MailerError::NoEmailConfig => {
+                write!(formatter, "No email config provided.")
+            },
+            MailerError::SmtpError(ref err) => err.fmt(formatter),
+            MailerError::Tls(ref err) => err.fmt(formatter),
+        }
+    }
+}
 
 impl From<io::Error> for MailerError {
     fn from(err: io::Error) -> Self {
@@ -211,7 +176,7 @@ impl From<native_tls::Error> for MailerError {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::exit_code;
+    use crate::notifications::notification_info::test::NOTIFICATION_INFO;
     use crate::test::PROJECT_ROOT_PATH;
     use lazy_static::lazy_static;
     use mailin_embedded::{
@@ -240,11 +205,6 @@ mod test {
         // Tests are run concurrently, therefore, each test's mail server must
         // run on a unique port.
         static ref PORT_INCREMENTER: AtomicUsize = AtomicUsize::new(9000);
-        static ref NOTIFICATION_INFO: NotificationInfo = NotificationInfo {
-            incantation: Incantation::new("command", vec!["foo", "bar"]),
-            exit_code: exit_code::SUCCESS,
-            elapsed_time: Duration::from_secs(1),
-        };
     }
 
     // Workaround: SslConfig doesn't implement Clone so we can't make this a
@@ -267,7 +227,7 @@ mod test {
     }
 
     impl EmailConfig {
-        fn new<I, S>(recipients: I) -> Self
+        pub fn new<I, S>(recipients: I) -> Self
         where
             I: IntoIterator<Item = S>,
             S: Into<String>,
@@ -415,7 +375,7 @@ mod test {
         let mut mailer = Mailer::new(config.clone(), credentials).unwrap();
         assert!(auth_success_receiver.iter().next().unwrap());
 
-        let result = mailer.notify(&NOTIFICATION_INFO);
+        let result = mailer.dispatch_notification(NOTIFICATION_INFO.clone());
         assert!(auth_success_receiver.iter().next().unwrap());
         assert!(result.is_ok());
 
@@ -427,11 +387,7 @@ mod test {
         let headers = &email.headers;
 
         let subject = headers.get_first_value("Subject").unwrap().unwrap();
-        let expected_subject = format!(
-            "`{}` succeeded",
-            NOTIFICATION_INFO.incantation.command.to_string_lossy()
-        );
-        assert_eq!(subject, expected_subject);
+        assert_eq!(subject, NOTIFICATION_INFO.brief);
 
         let to = headers.get_first_value("To").unwrap().unwrap();
         for recipient in config.email.unwrap().recipients {
@@ -444,103 +400,10 @@ mod test {
         assert_eq!(from, expected_from);
 
         let plaintext_body = body_for_mimetype(&email, "text/plain");
-        let expected_plaintext_body = format!(
-            "`{}` succeeded in {}.",
-            NOTIFICATION_INFO.incantation,
-            duration_format(&NOTIFICATION_INFO.elapsed_time)
-        );
-        assert_eq!(plaintext_body.trim(), expected_plaintext_body);
+        assert_eq!(plaintext_body.trim(), NOTIFICATION_INFO.details);
 
         let html_body = body_for_mimetype(&email, "text/html");
-        let expected_html_body = format!(
-            "<code>{}</code> succeeded in {}.",
-            NOTIFICATION_INFO.incantation,
-            duration_format(&NOTIFICATION_INFO.elapsed_time)
-        );
-        assert_eq!(html_body.trim(), expected_html_body);
-    }
-
-    #[test]
-    fn sends_mail_on_failure() {
-        let notification_info = NotificationInfo {
-            incantation: Incantation::new("command", vec!["foo", "bar"]),
-            exit_code: exit_code::FAILURE,
-            elapsed_time: Duration::from_secs(1),
-        };
-        let config = Config {
-            email: Some(EmailConfig::new(vec![
-                "recipient1@localhost",
-                "recipient2@localhost",
-                "recipient3@localhost",
-            ])),
-            ..Default::default()
-        };
-        let credentials = SmtpCredentials::new_valid();
-        let server_address =
-            format!("{}:{}", credentials.hostname, credentials.port.unwrap());
-        let (auth_sender, auth_success_receiver) = mpsc::channel();
-        let (data_sender, data_receiver) = mpsc::channel();
-        let handler = Handler {
-            auth_sender,
-            data_sender,
-        };
-        let mut server = Server::new(handler);
-        server
-            .with_ssl(ssl_config())
-            .with_num_threads(1)
-            .with_auth(AuthMechanism::Plain)
-            .with_addr(server_address)
-            .unwrap();
-        let handle = server.serve().unwrap();
-
-        let mut mailer = Mailer::new(config.clone(), credentials).unwrap();
-        assert!(auth_success_receiver.iter().next().unwrap());
-
-        let result = mailer.notify(&notification_info);
-        assert!(auth_success_receiver.iter().next().unwrap());
-        assert!(result.is_ok());
-
-        handle.stop();
-        assert_eq!(auth_success_receiver.iter().count(), 0);
-
-        let email = data_receiver.iter().flatten().collect::<Vec<_>>();
-        let email = mailparse::parse_mail(&email).unwrap();
-        let headers = &email.headers;
-
-        let subject = headers.get_first_value("Subject").unwrap().unwrap();
-        let expected_subject = format!(
-            "`{}` failed",
-            notification_info.incantation.command.to_string_lossy()
-        );
-        assert_eq!(subject, expected_subject);
-
-        let to = headers.get_first_value("To").unwrap().unwrap();
-        for recipient in config.email.unwrap().recipients {
-            assert!(to.contains(&recipient));
-        }
-
-        let from = headers.get_first_value("From").unwrap().unwrap();
-        let expected_from =
-            format!("\"{}\" <{}>", DID_IT_RUN_NAME, DID_IT_RUN_EMAIL);
-        assert_eq!(from, expected_from);
-
-        let plaintext_body = body_for_mimetype(&email, "text/plain");
-        let expected_plaintext_body = format!(
-            "`{}` failed with exit code {} in {}.",
-            notification_info.incantation,
-            notification_info.exit_code,
-            duration_format(&notification_info.elapsed_time)
-        );
-        assert_eq!(plaintext_body.trim(), expected_plaintext_body);
-
-        let html_body = body_for_mimetype(&email, "text/html");
-        let expected_html_body = format!(
-            "<code>{}</code> failed with exit code {} in {}.",
-            NOTIFICATION_INFO.incantation,
-            notification_info.exit_code,
-            duration_format(&NOTIFICATION_INFO.elapsed_time)
-        );
-        assert_eq!(html_body.trim(), expected_html_body);
+        assert_eq!(html_body.trim(), NOTIFICATION_INFO.html_details);
     }
 
     #[test]
@@ -632,14 +495,17 @@ mod test {
         let handle = server.serve().unwrap();
 
         let mut mailer = Mailer::new(config.clone(), credentials).unwrap();
-        let result = mailer.notify(&NOTIFICATION_INFO);
+        let result = mailer.dispatch_notification(NOTIFICATION_INFO.clone());
         handle.stop();
 
         assert!(!auth_success_receiver.iter().next().unwrap());
         assert_eq!(auth_success_receiver.iter().count(), 0);
         assert_eq!(data_receiver.iter().count(), 0);
         assert!(result.is_err());
-        assert_matches!(result.unwrap_err(), MailerError::SmtpError(_));
+        assert_matches!(
+            result.unwrap_err(),
+            NotifierError::Email(MailerError::SmtpError(_))
+        );
     }
 
     #[test]

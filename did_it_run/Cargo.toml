@@ -28,6 +28,18 @@ rev = "8f1c9dbec525be0ececfdffe2c43d41b467eacfa"
 git = "https://github.com/lettre/lettre/"
 rev = "8f1c9dbec525be0ececfdffe2c43d41b467eacfa"
 
+[target.'cfg(target_os = "linux")'.dependencies]
+glib = "^0.4.0" # Match libnotify dependency
+libnotify = "~1.0.3"
+
+[target.'cfg(target_os = "macos")'.dependencies.mac-notification-sys]
+# TODO(#31): Upgrade mac-notification-sys when/if Failure error handling is
+# removed
+git = "https://github.com/h4llow3En/mac-notification-sys"
+
+[target.'cfg(target_os = "windows")'.dependencies.winrt]
+version = "~0.5.1"
+features = ["windows-data", "windows-ui"]
 
 [dev-dependencies]
 matches = "~0.1.8"

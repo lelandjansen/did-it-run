@@ -3,6 +3,7 @@ codecov:
     require_ci_to_pass: yes
 ignore:
   - "did_it_run/src/main.rs"
+  - "did_it_run/src/notifications/desktop.rs"
 coverage:
   precision: 2
   round: down

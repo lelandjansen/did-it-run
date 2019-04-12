@@ -1,13 +1,15 @@
+#![deny(warnings)]
+
 mod cli;
 mod config;
 mod duration_format;
-mod email;
 mod exit_code;
 mod incantation;
+mod notifications;
 
 use crate::config::{DEFAULT_CONFIG_FILES, DEFAULT_CREDENTIALS_FILES};
-use crate::email::{Mailer, NotificationInfo};
 use crate::exit_code::ExitCode;
+use crate::notifications::Notifier;
 use std::env;
 use std::fmt::Display;
 use std::process;
@@ -38,18 +40,8 @@ fn main() {
     let credentials =
         config::Credentials::from_user_credentials(user_credentials)
             .unwrap_or_else(|err| exit(err, exit_code::CONFIG));
-    let mailer = match (&config.email, credentials.smtp) {
-        (Some(_), Some(credentials)) => {
-            match Mailer::new(config, credentials) {
-                Ok(mailer) => Some(mailer),
-                Err(err) => exit(err, exit_code::FAILURE),
-            }
-        },
-        (Some(_), None) => {
-            exit("Cannot find SMTP credentials", exit_code::CONFIG);
-        },
-        (..) => None,
-    };
+    let mut notifier = Notifier::new(config, credentials)
+        .unwrap_or_else(|err| exit(err, exit_code::FAILURE));
 
     let outcome = incantation::run(&options.incantation);
     let incantation_exit_code = match outcome.result {
@@ -59,18 +51,16 @@ fn main() {
             err.raw_os_error().unwrap_or(exit_code::FAILURE)
         },
     };
-    let info = NotificationInfo {
+    let event = notifications::Event::Finished {
         incantation: options.incantation,
         exit_code: incantation_exit_code,
         elapsed_time: outcome.elapsed_time,
     };
 
-    if let Some(mut mailer) = mailer {
-        if let Err(err) = mailer.notify(&info) {
-            let message = format!("Failed to send email notification: {}", err);
-            exit(message, exit_code::FAILURE);
-        }
-    }
+    notifier
+        .notify(event)
+        .unwrap_or_else(|err| exit(err, exit_code::FAILURE));
+
     process::exit(incantation_exit_code);
 }
 

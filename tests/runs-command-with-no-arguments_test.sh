@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 BINARY_NAME=$1
+shift
 
-result="$($BINARY_NAME echo)"
+result="$($BINARY_NAME $@ echo)"
 code=$?
 result="$(tr -dc \"[[:print:]]\" <<< $result)" # remove non-printable characters
 if [ "$result" != "" ]; then

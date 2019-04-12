@@ -1,5 +1,6 @@
 version = "0.0.1"
 timeout = 42
+desktop_notifications = true
 validate = true
 
 [email]

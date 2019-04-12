@@ -34,6 +34,16 @@ ARGS:
 ```
 
 ## Installation and setup
+
+### Dependencies
+* `libnotify` (Linux)
+
+### Dev dependencies
+* `libnotify-dev` (Linux)
+* `libssl-dev` (Linux) 
+* [OpenSSL][openssl-windows] (Windows)
+
+Install the binary
 ```
 $ cargo install --path did_it_run
 ```
@@ -45,9 +55,6 @@ Specify your SMTP server credentials in `~/.diditrun/credentials.toml` or
 Optionally specify default configurations in `~/.diditrun/config.toml` or
 `~/diditrun/config.toml`. Example:
 [diditrun/config.toml](tests/fixtures/diditrun/config.toml)
-
-### Dev dependencies
-* OpenSSL
 
 ## Testing
 Create and self-sign a dummy TLS certificate (required by some email tests):
@@ -72,7 +79,7 @@ Check code style (requires nightly)
 $ ./check-style.sh
 ```
 
-Apply suggested style changes
+Apply suggested style changes (requires nightly)
 ```
 $ ./beautify.sh
 ```
@@ -81,3 +88,4 @@ $ ./beautify.sh
 [ci-badge]: https://dev.azure.com/lelandjansen/did-it-run/_apis/build/status/ci?branchName=master
 [coverage]: https://codecov.io/gh/lelandjansen/did-it-run
 [coverage-badge]: https://codecov.io/gh/lelandjansen/did-it-run/branch/master/graph/badge.svg
+[openssl-windows]: https://slproweb.com/products/Win32OpenSSL.html
