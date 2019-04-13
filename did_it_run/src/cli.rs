@@ -1,12 +1,12 @@
+use crate::config::{MergeOptions, TimeoutInput, UserConfig};
+use crate::email::EmailConfig;
+use crate::incantation::Incantation;
+use crate::DID_IT_RUN_NAME;
 use clap;
-use clap::Arg;
-use config::{MergeOptions, TimeoutInput, UserConfig};
-use email::EmailConfig;
-use incantation::Incantation;
+use clap::{crate_authors, crate_description, crate_version, Arg};
 use std::default::Default;
 use std::ffi::OsString;
 use std::path::PathBuf;
-use DID_IT_RUN_NAME;
 
 const ARGUMENTS: &str = "ARGUMENTS";
 const CONFIG_FILE: &str = "CONFIG_FILE";

@@ -6,6 +6,7 @@ homepage = "https://www.didit.run"
 repository = "https://github.com/lelandjansen/did-it-run"
 license = "Apache-2.0"
 authors = ["Leland Jansen <hello@lelandjansen.com>"]
+edition = "2018"
 
 [dependencies]
 clap = "~2.32.0"

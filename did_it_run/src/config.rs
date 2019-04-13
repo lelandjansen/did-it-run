@@ -1,6 +1,8 @@
-use email::{EmailConfig, SmtpCredentials};
+use crate::email::{EmailConfig, SmtpCredentials};
+use lazy_static::lazy_static;
 use semver::{SemVerError, Version};
 use serde::de::DeserializeOwned;
+use serde_derive::Deserialize;
 use std::default::Default;
 use std::error;
 use std::fmt;
@@ -221,7 +223,8 @@ impl From<Version> for ConfigError {
 #[cfg(test)]
 mod test {
     use super::*;
-    use test::PROJECT_ROOT_PATH;
+    use crate::test::PROJECT_ROOT_PATH;
+    use matches::assert_matches;
 
     lazy_static! {
         static ref CONFIG_FIXTURE_PATH: PathBuf =
