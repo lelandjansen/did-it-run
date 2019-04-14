@@ -1,0 +1,64 @@
+jobs:
+- job: test
+  strategy:
+    matrix:
+      linux-stable:
+        imageName: 'ubuntu-16.04'
+        rustup_toolchain: stable
+      macos-stable:
+        imageName: 'macos-10.14'
+        rustup_toolchain: stable
+      windows-stable:
+        imageName: 'windows-2019'
+        rustup_toolchain: stable
+      linux-beta:
+        imageName: 'ubuntu-16.04'
+        rustup_toolchain: beta
+      linux-nightly:
+        imageName: 'ubuntu-16.04'
+        rustup_toolchain: nightly
+  pool:
+    vmImage: $(imageName)
+  steps:
+  - template: ./templates/install-common.yml
+  - script: cargo build --verbose --all
+    displayName: Cargo build
+  - script: cargo test --verbose --all
+    displayName: Cargo test
+  - bash: |
+      cargo install --debug --force --path did_it_run
+      ./run-test-scripts.sh
+    displayName: Run test scripts
+- job: style_and_coverage
+  pool:
+    vmImage: 'ubuntu-16.04'
+  variables:
+  - group: codecov
+  - name: rustup_toolchain
+    value: nightly
+  steps:
+  - script: |
+      sudo apt-get update
+      sudo apt-get install -y \
+        libcurl4-openssl-dev \
+        libelf-dev \
+        libdw-dev \
+        cmake \
+        gcc \
+        binutils-dev \
+        libiberty-dev
+    displayName: Install dependencies
+  - template: ./templates/install-common.yml
+  - script: |
+      rustup component add rustfmt-preview
+      rustup component add clippy-preview
+    displayName: Install rustfmt and clippy
+  - script: |
+      cargo test --verbose --all --no-run
+      ./check-style.sh
+    displayName: Check style
+  - script: |
+      ./.build/codecov.sh
+    env:
+      CODECOV_TOKEN: $(codecov_upload_token)
+    displayName: Coverage

@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 BINARY_NAME="diditrun"
 
-run-parts \
-  --verbose \
-  --regex ".*_test.*" \
-  --arg="$BINARY_NAME" \
-  "$DIR/tests"
+for filename in $(find "$DIR/tests" -type f -name "*_test.sh"); do
+  echo "$filename"
+  bash -c "$filename $BINARY_NAME"
+done

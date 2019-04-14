@@ -8,4 +8,4 @@ result="$(tr -dc \"[[:print:]]\" <<< $result)" # remove non-printable characters
 if [ "$result" != "" ]; then
   exit 1
 fi
-exit "$code"
+exit $((code))

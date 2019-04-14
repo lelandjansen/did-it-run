@@ -1,0 +1,29 @@
+steps:
+# TODO(#27): Find a cleaner way to install OpenSSL on Windows.
+- script: |
+    curl -L -o OpenSSL-Win64.zip https://diditrun.blob.core.windows.net/did-it-run-dev/OpenSSL-Win64.zip
+    unzip OpenSSL-Win64.zip -d C:\
+    echo ##vso[task.setvariable variable=OPENSSL_DIR;]C:\OpenSSL-Win64
+  displayName: Install OpenSSL (Windows)
+  condition: eq(variables['Agent.OS'], 'Windows_NT')
+- script: |
+    ./tests/fixtures/tls/make-cert.sh
+    sudo ./tests/fixtures/tls/install-cert.sh
+  displayName: Install self-signed TLS certificate (Linux, macOS)
+  condition: ne(variables['Agent.OS'], 'Windows_NT')
+- bash: |
+    ./tests/fixtures/tls/make-cert.sh
+    ./tests/fixtures/tls/install-cert.sh
+  displayName: Install self-signed TLS certificate (Windows)
+  condition: eq(variables['Agent.OS'], 'Windows_NT')
+- script: |
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN
+    echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+  displayName: Install Rust (Linux, macOS)
+  condition: ne(variables['Agent.OS'], 'Windows_NT')
+- script: |
+    curl -sSf -o rustup-init.exe https://win.rustup.rs
+    rustup-init.exe -y --default-toolchain %RUSTUP_TOOLCHAIN%
+    echo ##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin
+  displayName: Install Rust (Windows)
+  condition: eq(variables['Agent.OS'], 'Windows_NT')
