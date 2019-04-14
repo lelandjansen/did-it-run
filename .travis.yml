@@ -1,12 +1,27 @@
 language: rust
 sudo: required
-rust:
-  - stable
-  - beta
+os:
+  - linux
+  - osx
+  - windows
 cache: cargo
+install:
+  - >
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      echo 'before'
+      choco --version
+      choco install --verbose openssl.light
+      choco install --verbose openssl.light
+      echo 'after'
+    fi
 before_script:
   - ./tests/fixtures/tls/make-cert.sh
-  - sudo ./tests/fixtures/tls/install-cert.sh
+  - >
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      ./tests/fixtures/tls/install-cert.sh
+    else
+      sudo ./tests/fixtures/tls/install-cert.sh
+    fi
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
@@ -15,6 +30,7 @@ script:
 jobs:
   include:
     - stage: style and coverage
+      os: linux
       rust: nightly
       cache: cargo
       addons:

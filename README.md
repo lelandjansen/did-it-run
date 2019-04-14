@@ -50,7 +50,7 @@ Optionally specify default configurations in `~/.diditrun/config.toml` or
 Create and self-sign a dummy TLS certificate (required by some email tests):
 ```
 $ ./tests/fixtures/tls/make-cert.sh
-$ ./tests/fixtures/tls/install-cert.sh
+$ sudo ./tests/fixtures/tls/install-cert.sh
 ```
 
 Unit tests
