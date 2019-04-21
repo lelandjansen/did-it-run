@@ -46,11 +46,14 @@ Optionally specify default configurations in `~/.diditrun/config.toml` or
 `~/diditrun/config.toml`. Example:
 [diditrun/config.toml](tests/fixtures/diditrun/config.toml)
 
+### Dev dependencies
+* OpenSSL
+
 ## Testing
 Create and self-sign a dummy TLS certificate (required by some email tests):
 ```
 $ ./tests/fixtures/tls/make-cert.sh
-$ ./tests/fixtures/tls/install-cert.sh
+$ sudo ./tests/fixtures/tls/install-cert.sh
 ```
 
 Unit tests
@@ -74,7 +77,7 @@ Apply suggested style changes
 $ ./beautify.sh
 ```
 
-[ci]: https://travis-ci.com/lelandjansen/did-it-run
-[ci-badge]: https://travis-ci.com/lelandjansen/did-it-run.svg?branch=master
+[ci]: https://dev.azure.com/lelandjansen/did-it-run/_build/latest?definitionId=1&branchName=master
+[ci-badge]: https://dev.azure.com/lelandjansen/did-it-run/_apis/build/status/ci?branchName=master
 [coverage]: https://codecov.io/gh/lelandjansen/did-it-run
 [coverage-badge]: https://codecov.io/gh/lelandjansen/did-it-run/branch/master/graph/badge.svg

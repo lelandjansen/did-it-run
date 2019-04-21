@@ -11,4 +11,4 @@ result="$(tr -dc \"[[:print:]]\" <<< $result)" # remove non-printable characters
 if [ "$result" != "$arg1 $arg2 $arg3" ]; then
   exit 1
 fi
-exit "$code"
+exit $((code))

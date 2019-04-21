@@ -78,17 +78,35 @@ fn main() {
 mod test {
     use super::*;
     use lazy_static::lazy_static;
+    use std::collections::HashSet;
     use std::ffi::OsString;
+    use std::fs;
     use std::path::PathBuf;
 
     lazy_static! {
         static ref PROJECT_ROOT_NAME: OsString = OsString::from("did-it-run");
         pub static ref PROJECT_ROOT_PATH: PathBuf = {
-            let mut path = PathBuf::from(env::var_os("PWD").unwrap());
-            path.iter()
-                .find(|component| component == &PROJECT_ROOT_NAME.as_os_str())
-                .expect("Test not run in project directory");
-            while path.file_name().unwrap() != PROJECT_ROOT_NAME.as_os_str() {
+            let pwd =
+                env::current_dir().expect("Current directory not available.");
+            let mut path = PathBuf::from(pwd);
+            // Heuristic: Use a unique set of file names contained in the
+            // project's root folder to identify it.
+            let root_folder_files_sample: HashSet<_> =
+                ["did_it_run", "Cargo.lock", "README.md"]
+                    .iter()
+                    .map(OsString::from)
+                    .collect();
+            loop {
+                let files: HashSet<_> = fs::read_dir(&path)
+                    .unwrap()
+                    .map(|file| file.unwrap().file_name())
+                    .collect();
+                if files.is_superset(&root_folder_files_sample) {
+                    break;
+                }
+                if path == PathBuf::from("/") {
+                    panic!("Test not run inside project directory.");
+                }
                 path.pop();
             }
             path

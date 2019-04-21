@@ -63,13 +63,13 @@ mod test {
 
     #[test]
     fn exits_with_status() {
-        let base_args = vec!["bash", "-c", EXIT_WITH_STATUS];
+        let base_args = vec!["-c", EXIT_WITH_STATUS];
         let status_codes = [-7, -1, 0, 1, 2, 254, 255, 256, 2000];
         for status_code in &status_codes {
             let status_arg = status_code.to_string();
             let mut args = base_args.clone();
             args.push(&status_arg);
-            let incantation = Incantation::new("/usr/bin/env", args.clone());
+            let incantation = Incantation::new("bash", args.clone());
             let outcome = run(&incantation);
             // When a parent retrieves the exit status of its child, only the
             // least-significant eight bits are available.
@@ -80,9 +80,9 @@ mod test {
 
     #[test]
     fn handles_arguments() {
-        let mut args = vec!["bash", "-c", EXIT_WITH_ARGUMENT_COUNT, "bash"];
+        let mut args = vec!["-c", EXIT_WITH_ARGUMENT_COUNT, "bash"];
         for argument_count in 0..5 {
-            let incantation = Incantation::new("/usr/bin/env", args.clone());
+            let incantation = Incantation::new("bash", args.clone());
             let outcome = run(&incantation);
             assert_eq!(argument_count, outcome.result.unwrap().code().unwrap());
             args.push("another_arg");
