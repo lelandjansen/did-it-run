@@ -2,9 +2,11 @@
 STATUS=0
 sort --check CONTRIBUTORS || STATUS=1
 sort --check rustfmt.toml || STATUS=1
-# Fall back to an older nightly if the current version doesn't have rustfmt and
-# clippy
-cargo +nightly fmt --all -- --check || STATUS=1
+if [ -z "$RUSTUP_TOOLCHAIN" ]; then
+  cargo +nightly fmt --all -- --check || STATUS=1
+else
+  cargo fmt --all -- --check || STATUS=1
+fi
 ! git \
   --no-pager \
   grep \
@@ -19,5 +21,9 @@ cargo +nightly fmt --all -- --check || STATUS=1
       ':!rustfmt.toml' \
       ':!check-style.sh' ||
   STATUS=1
-cargo +nightly clippy -- -D warnings || STATUS=1
+if [ -z "$RUSTUP_TOOLCHAIN" ]; then
+  cargo +nightly clippy -- -D warnings || STATUS=1
+else
+  cargo clippy -- -D warnings || STATUS=1
+fi
 exit $STATUS
