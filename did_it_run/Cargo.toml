@@ -21,20 +21,19 @@ toml = "~0.5.0"
 # TODO(#19): lettre = "~0.9.1"
 [dependencies.lettre]
 git = "https://github.com/lettre/lettre/"
-rev = "8f1c9dbec525be0ececfdffe2c43d41b467eacfa"
+rev = "c638650d0a9ceec655f542c7423d8df6d95f61f3"
 
 # TODO(#19): lettre_email = "~0.9.1"
 [dependencies.lettre_email]
 git = "https://github.com/lettre/lettre/"
-rev = "8f1c9dbec525be0ececfdffe2c43d41b467eacfa"
+rev = "c638650d0a9ceec655f542c7423d8df6d95f61f3"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 glib = "^0.4.0" # Match libnotify dependency
 libnotify = "~1.0.3"
 
 [target.'cfg(target_os = "macos")'.dependencies.mac-notification-sys]
-# TODO(#31): Upgrade mac-notification-sys when/if Failure error handling is
-# removed
+# TODO(#31): Upgrade mac-notification-sys when/if Failure error handling is removed
 git = "https://github.com/h4llow3En/mac-notification-sys"
 
 [target.'cfg(target_os = "windows")'.dependencies.winrt]

@@ -81,8 +81,7 @@ impl Mailer {
                 None,
             )?;
             let mut client: InnerClient<NetworkStream> = InnerClient::new();
-            client.set_timeout(config.timeout)?;
-            client.connect(&socket_addr, None)?;
+            client.connect(&socket_addr, config.timeout, None)?;
             client.command(&ehlo_command)?;
             client.command(StarttlsCommand)?;
             client.upgrade_tls_stream(&tls_parameters)?;
