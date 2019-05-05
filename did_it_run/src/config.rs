@@ -1,4 +1,4 @@
-use crate::email::{EmailConfig, SmtpCredentials};
+use crate::notifications::email::{EmailConfig, SmtpCredentials};
 use lazy_static::lazy_static;
 use semver::{SemVerError, Version};
 use serde::de::DeserializeOwned;
@@ -16,12 +16,12 @@ pub type TimeoutInput = u64;
 
 lazy_static! {
     static ref HOME_DIR: PathBuf = dirs::home_dir().unwrap_or_default();
-    static ref LATEST_CONFIG_VERSION: Version =
+    pub static ref LATEST_CONFIG_VERSION: Version =
         Version::parse("0.0.1").unwrap();
-    static ref LATEST_CREDENTIALS_VERSION: Version =
+    pub static ref LATEST_CREDENTIALS_VERSION: Version =
         Version::parse("0.0.1").unwrap();
     static ref DEFAULT_DIRECTORIES: Vec<PathBuf> =
-        vec![HOME_DIR.join("diditrun"), HOME_DIR.join(".diditrun"),];
+        vec![HOME_DIR.join("diditrun"), HOME_DIR.join(".diditrun")];
     pub static ref DEFAULT_CONFIG_FILES: Vec<PathBuf> = DEFAULT_DIRECTORIES
         .iter()
         .map(|dir| dir.join("config.toml"))
@@ -36,6 +36,7 @@ lazy_static! {
 #[derive(Clone, Debug, Default, Deserialize, PartialEq)]
 pub struct UserConfig {
     pub version: Option<String>,
+    pub desktop_notifications: Option<bool>,
     pub email: Option<EmailConfig>,
     pub validate: Option<bool>,
     pub timeout: Option<TimeoutInput>,
@@ -44,6 +45,7 @@ pub struct UserConfig {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Config {
     pub version: Version,
+    pub desktop_notifications: bool,
     pub email: Option<EmailConfig>,
     pub validate: bool,
     pub timeout: Option<Duration>,
@@ -110,8 +112,12 @@ pub fn merge(
     } else {
         cli_config.email.or(file_config.email)
     };
+    let desktop_notifications = cli_config
+        .desktop_notifications
+        .or(file_config.desktop_notifications);
     UserConfig {
         version: cli_config.version.or(file_config.version),
+        desktop_notifications,
         email,
         validate: cli_config.validate.or(file_config.validate),
         timeout: cli_config.timeout.or(file_config.timeout),
@@ -125,7 +131,7 @@ impl Config {
         let version = if let Some(version) = user_config.version {
             Version::parse(&version)?
         } else {
-            LATEST_CONFIG_VERSION.to_owned()
+            LATEST_CONFIG_VERSION.clone()
         };
         let email = user_config.email.and_then(|email| {
             if email.recipients.is_empty() {
@@ -136,11 +142,14 @@ impl Config {
                 })
             }
         });
+        let desktop_notifications =
+            user_config.desktop_notifications.unwrap_or(true);
         if *LATEST_CREDENTIALS_VERSION < version {
             Err(ConfigError::InvalidVersion(version))
         } else {
             Ok(Config {
                 version,
+                desktop_notifications,
                 email,
                 validate: user_config.validate.unwrap_or(true),
                 timeout: user_config.timeout.map(Duration::from_secs),
@@ -156,7 +165,7 @@ impl Credentials {
         let version = if let Some(version) = user_credentials.version {
             Version::parse(&version)?
         } else {
-            LATEST_CREDENTIALS_VERSION.to_owned()
+            LATEST_CREDENTIALS_VERSION.clone()
         };
         if *LATEST_CREDENTIALS_VERSION < version {
             Err(ConfigError::InvalidVersion(version))
@@ -238,7 +247,8 @@ mod test {
     impl Default for Config {
         fn default() -> Self {
             Config {
-                version: LATEST_CONFIG_VERSION.to_owned(),
+                version: LATEST_CONFIG_VERSION.clone(),
+                desktop_notifications: true,
                 email: None,
                 validate: true,
                 timeout: None,
@@ -256,6 +266,7 @@ mod test {
         assert!(user_config.is_ok());
         let expected_user_config = UserConfig {
             version: Some(LATEST_CONFIG_VERSION.to_string()),
+            desktop_notifications: Some(true),
             email: Some(EmailConfig {
                 recipients: vec!["someone@example.com".to_string()],
             }),
@@ -272,6 +283,7 @@ mod test {
         assert!(user_config.is_ok());
         let expected_user_config = UserConfig {
             version: Some(LATEST_CONFIG_VERSION.to_string()),
+            desktop_notifications: Some(false),
             email: Some(EmailConfig {
                 recipients: vec!["default@example.com".to_string()],
             }),
@@ -393,6 +405,7 @@ mod test {
     fn merges_user_configs() {
         let cli_config = UserConfig {
             version: Some(LATEST_CONFIG_VERSION.to_string()),
+            desktop_notifications: Some(true),
             email: Some(EmailConfig {
                 recipients: vec!["cli_config@example.com".to_string()],
             }),
@@ -409,6 +422,7 @@ mod test {
 
         let file_config = UserConfig {
             version: Some(LATEST_CONFIG_VERSION.to_string()),
+            desktop_notifications: Some(false),
             email: Some(EmailConfig {
                 recipients: vec!["file_config@example.com".to_string()],
             }),
@@ -424,12 +438,14 @@ mod test {
 
         let cli_config = UserConfig {
             version: Some(LATEST_CONFIG_VERSION.to_string()),
+            desktop_notifications: Some(true),
             email: None,
             validate: Some(true),
             timeout: None,
         };
         let expected = UserConfig {
             version: cli_config.version.clone(),
+            desktop_notifications: cli_config.desktop_notifications.clone(),
             email: file_config.email.clone(),
             validate: cli_config.validate.clone(),
             timeout: file_config.timeout.clone(),
@@ -440,14 +456,16 @@ mod test {
 
     #[test]
     fn creates_config_from_user_config() {
-        let version = LATEST_CONFIG_VERSION.to_owned();
+        let version = LATEST_CONFIG_VERSION.clone();
         let email_config = EmailConfig {
             recipients: vec!["someone@example.com".to_string()],
         };
+        let desktop_notifications = true;
         let validate = true;
         let timeout = 12;
         let user_config = UserConfig {
             version: Some(version.to_string()),
+            desktop_notifications: Some(desktop_notifications),
             email: Some(email_config.clone()),
             validate: Some(validate),
             timeout: Some(timeout),
@@ -455,6 +473,7 @@ mod test {
         let config = Config::from_user_config(user_config).unwrap();
         let expected_config = Config {
             version,
+            desktop_notifications,
             email: Some(email_config),
             validate,
             timeout: Some(Duration::from_secs(timeout)),
@@ -486,7 +505,7 @@ mod test {
 
     #[test]
     fn creates_credentials_from_user_credentials() {
-        let version = LATEST_CONFIG_VERSION.to_owned();
+        let version = LATEST_CONFIG_VERSION.clone();
         let smtp_credentials =
             SmtpCredentials::new("hostname", 1234, "username", "password");
         let user_credentials = UserCredentials {
@@ -497,6 +516,23 @@ mod test {
             Credentials::from_user_credentials(user_credentials).unwrap();
         let expected_credentials = Credentials {
             version,
+            smtp: Some(smtp_credentials),
+        };
+        assert_eq!(credentials, expected_credentials);
+    }
+
+    #[test]
+    fn creates_credentials_from_user_credentials_no_version() {
+        let smtp_credentials =
+            SmtpCredentials::new("hostname", 1234, "username", "password");
+        let user_credentials = UserCredentials {
+            version: None,
+            smtp: Some(smtp_credentials.clone()),
+        };
+        let credentials =
+            Credentials::from_user_credentials(user_credentials).unwrap();
+        let expected_credentials = Credentials {
+            version: LATEST_CONFIG_VERSION.clone(),
             smtp: Some(smtp_credentials),
         };
         assert_eq!(credentials, expected_credentials);

@@ -1,6 +1,6 @@
 use crate::config::{MergeOptions, TimeoutInput, UserConfig};
-use crate::email::EmailConfig;
 use crate::incantation::Incantation;
+use crate::notifications::email::EmailConfig;
 use crate::DID_IT_RUN_NAME;
 use clap;
 use clap::{crate_authors, crate_description, crate_version, Arg};
@@ -13,6 +13,7 @@ const CONFIG_FILE: &str = "CONFIG_FILE";
 const CREDENTIALS_FILE: &str = "CREDENTIALS_FILE";
 const COMMAND: &str = "COMMAND";
 const EMAIL: &str = "EMAIL";
+const NO_DESKTOP: &str = "NO_DESKTOP";
 const NO_EMAIL: &str = "NO_EMAIL";
 const NO_VALIDATE: &str = "NO_VALIDATE";
 const TIMEOUT: &str = "TIMEOUT";
@@ -46,6 +47,12 @@ where
                 .long("credentials")
                 .value_name("FILE")
                 .help("Path to credentials file"),
+        )
+        .arg(
+            Arg::with_name(NO_DESKTOP)
+                .long("no-desktop")
+                .help("Do not show desktop notifications")
+                .conflicts_with(EMAIL),
         )
         .arg(
             Arg::with_name(NO_EMAIL)
@@ -93,6 +100,7 @@ where
     if let Some(recipients) = matches.values_of_lossy(EMAIL) {
         cli_config.email = Some(EmailConfig { recipients });
     }
+    cli_config.desktop_notifications = Some(!matches.is_present(NO_DESKTOP));
     cli_config.validate = Some(!matches.is_present(NO_VALIDATE));
     if let Some(timeout) = matches.value_of(TIMEOUT) {
         // Clap already validates this value using `validate_timeout`.
