@@ -81,7 +81,8 @@ impl Mailer {
                 None,
             )?;
             let mut client: InnerClient<NetworkStream> = InnerClient::new();
-            client.connect(&socket_addr, config.timeout, None)?;
+            client.set_timeout(config.timeout)?;
+            client.connect(&socket_addr, None)?;
             client.command(&ehlo_command)?;
             client.command(StarttlsCommand)?;
             client.upgrade_tls_stream(&tls_parameters)?;
@@ -116,7 +117,7 @@ impl Dispatcher for Mailer {
         for recipient in &self.config.recipients {
             builder = builder.to(recipient.clone());
         }
-        let email = builder.build().map_err(MailerError::LettreEmail)?.into();
+        let email = builder.build()?.into();
         self.mailer.send(email).map_err(MailerError::SmtpError)?;
         Ok(())
     }
@@ -150,7 +151,9 @@ impl From<io::Error> for MailerError {
 impl From<lettre_email::error::Error> for MailerError {
     fn from(err: lettre_email::error::Error) -> Self {
         match err {
-            lettre_email::error::Error::Io(err) => MailerError::Io(err),
+            lettre_email::error::Error::Io { error: err } => {
+                MailerError::Io(err)
+            },
             _ => MailerError::LettreEmail(err),
         }
     }
