@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::notifications::{Dispatcher, NotificationInfo, NotifierError};
 use crate::{DID_IT_RUN_EMAIL, DID_IT_RUN_NAME};
+use common::types::Port;
 use lettre::smtp::authentication::Mechanism;
 use lettre::smtp::client::net::{ClientTlsParameters, NetworkStream};
 use lettre::smtp::client::InnerClient;
@@ -18,8 +19,6 @@ use std::error;
 use std::fmt;
 use std::io;
 use std::net::ToSocketAddrs;
-
-pub type Port = u16;
 
 const STARTTLS_PORT: Port = 587;
 const AUTHENTICATION_MECHANISM: Mechanism = Mechanism::Plain;
