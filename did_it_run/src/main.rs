@@ -10,12 +10,10 @@ mod notifications;
 use crate::config::{DEFAULT_CONFIG_FILES, DEFAULT_CREDENTIALS_FILES};
 use crate::exit_code::ExitCode;
 use crate::notifications::Notifier;
+use common::{DID_IT_RUN_EMAIL, DID_IT_RUN_NAME};
 use std::env;
 use std::fmt::Display;
 use std::process;
-
-const DID_IT_RUN_NAME: &str = "Did it Run?";
-const DID_IT_RUN_EMAIL: &str = "notifications@didit.run";
 
 fn exit<E: Display>(err: E, exit_code: ExitCode) -> ! {
     eprintln!("{}", err);
