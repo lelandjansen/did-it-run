@@ -22,7 +22,7 @@ pub enum Event {
 }
 
 pub struct Notifier {
-    dispatchers: Vec<Box<Dispatcher>>,
+    dispatchers: Vec<Box<dyn Dispatcher>>,
 }
 
 #[derive(Debug)]
@@ -43,7 +43,7 @@ impl Notifier {
         config: Config,
         credentials: Credentials,
     ) -> Result<Self, NotifierError> {
-        let mut dispatchers: Vec<Box<Dispatcher>> = vec![];
+        let mut dispatchers: Vec<Box<dyn Dispatcher>> = vec![];
         if config.desktop_notifications {
             let desktop_notifier = DesktopNotifier::new()?;
             dispatchers.push(Box::new(desktop_notifier));
