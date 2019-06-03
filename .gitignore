@@ -6,6 +6,7 @@
 
 # Coverage
 ./kcov-*
+*.tar.gz
 
 # Vim swap
 [._]*.s[a-v][a-z]
@@ -26,10 +27,6 @@ tags
 
 # macOS
 .DS_Store
-
-# Codecov
-/kcov-master/
-*.tar.gz
 
 # TLS
 *.crt

@@ -17,6 +17,7 @@ USAGE:
     diditrun [FLAGS] [OPTIONS] <COMMAND> [--] [ARGUMENTS]...
 
 FLAGS:
+        --no-desktop     Do not show desktop notifications
         --no-email       Do not send email notifications
         --no-validate    Do not validate credentials and inputs
     -h, --help           Prints help information
