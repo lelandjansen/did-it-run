@@ -39,7 +39,7 @@ libnotify = "~1.0.3"
 git = "https://github.com/h4llow3En/mac-notification-sys"
 
 [target.'cfg(target_os = "windows")'.dependencies.winrt]
-version = "~0.5.1"
+version = "~0.6.0"
 features = ["windows-data", "windows-ui"]
 
 [dev-dependencies]
