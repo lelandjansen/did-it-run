@@ -198,7 +198,7 @@ dependencies = [
  "lettre 0.9.1 (git+https://github.com/lettre/lettre/?rev=0ead3cde09a02918e3976aa442329fe247f05c55)",
  "lettre_email 0.9.1 (git+https://github.com/lettre/lettre/?rev=0ead3cde09a02918e3976aa442329fe247f05c55)",
  "libnotify 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "mac-notification-sys 0.3.0 (git+https://github.com/h4llow3En/mac-notification-sys)",
+ "mac-notification-sys 0.3.1 (git+https://github.com/h4llow3En/mac-notification-sys)",
  "mailin-embedded 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "mailparse 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "matches 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -530,8 +530,8 @@ dependencies = [
 
 [[package]]
 name = "mac-notification-sys"
-version = "0.3.0"
-source = "git+https://github.com/h4llow3En/mac-notification-sys#910f7d1be33da264dd7dc266e583c07c8e92ffbf"
+version = "0.3.1"
+source = "git+https://github.com/h4llow3En/mac-notification-sys#1106cbee7efc23542ee633b793aa0e39496f77c8"
 dependencies = [
  "cc 1.0.31 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1192,7 +1192,7 @@ dependencies = [
 "checksum libnotify 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "10506a4f8bc6f8f7ccc6fde3a8290378d7aed3d1a26dca606a73e2ffe140cc2d"
 "checksum libnotify-sys 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "a0a716b9b7d24ed10f1eb431e1527fa13c9a4bf2d4fa68bb3e54da1d0747383c"
 "checksum log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "c84ec4b527950aa83a329754b01dbe3f58361d1c5efacd1f6d68c494d08a17c6"
-"checksum mac-notification-sys 0.3.0 (git+https://github.com/h4llow3En/mac-notification-sys)" = "<none>"
+"checksum mac-notification-sys 0.3.1 (git+https://github.com/h4llow3En/mac-notification-sys)" = "<none>"
 "checksum mailin 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e025ff543b01f79beebe097ad0a5b4829d8719bb8d6e3d7daa6e4c827650f5d1"
 "checksum mailin-embedded 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "5001fd42a212eaed75155e5ff828d35ee1f440ff5f66eadbc3afbaf7ca315b60"
 "checksum mailparse 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "413924c6f9477d589f15fe5ad1189d794a795d305d035b41957ac7f406e8d0b6"
