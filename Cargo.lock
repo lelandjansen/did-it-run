@@ -200,7 +200,7 @@ dependencies = [
  "libnotify 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "mac-notification-sys 0.3.1 (git+https://github.com/h4llow3En/mac-notification-sys)",
  "mailin-embedded 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "mailparse 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mailparse 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "matches 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "native-tls 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -567,7 +567,7 @@ dependencies = [
 
 [[package]]
 name = "mailparse"
-version = "0.8.2"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1226,7 +1226,7 @@ dependencies = [
 "checksum mac-notification-sys 0.3.1 (git+https://github.com/h4llow3En/mac-notification-sys)" = "<none>"
 "checksum mailin 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e025ff543b01f79beebe097ad0a5b4829d8719bb8d6e3d7daa6e4c827650f5d1"
 "checksum mailin-embedded 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "5001fd42a212eaed75155e5ff828d35ee1f440ff5f66eadbc3afbaf7ca315b60"
-"checksum mailparse 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)" = "716df5964f60b32ddea2e381173d3b5b45ff16148085474c82eb41ee37c49914"
+"checksum mailparse 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c00eb97cc18f08aaadd02808328dcc9be94948d8e5b54adbfd3414d2f87f7bf1"
 "checksum malloc_buf 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb"
 "checksum matches 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "7ffc5c5338469d4d3ea17d269fa8ea3512ad247247c30bd2df69e68309ed0a08"
 "checksum memchr 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2efc7bc57c883d4a4d6e3246905283d8dae951bb3bd32f49d6ef297f546e1c39"
