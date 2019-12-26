@@ -8,7 +8,7 @@ steps:
   condition: eq(variables['Agent.OS'], 'Linux')
 # TODO(#27): Find a cleaner way to install OpenSSL on Windows.
 - script: |
-    curl -L -o OpenSSL-Win64.zip https://diditrun.blob.core.windows.net/did-it-run-dev/OpenSSL-Win64.zip
+    curl -L -o OpenSSL-Win64.zip https://cdn.didit.run/ci/OpenSSL-Win64.zip
     unzip OpenSSL-Win64.zip -d C:\
     echo ##vso[task.setvariable variable=OPENSSL_DIR;]C:\OpenSSL-Win64
   displayName: Install dependencies (Windows)
