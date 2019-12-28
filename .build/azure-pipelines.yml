@@ -35,7 +35,7 @@ jobs:
   variables:
   - group: codecov
   - name: rustup_toolchain
-    value: nightly-2019-05-01
+    value: nightly-2019-12-20
   steps:
   - script: |
       sudo apt-get update
