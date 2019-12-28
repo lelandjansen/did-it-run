@@ -22,8 +22,8 @@ fi
       ':!check-style.sh' ||
   STATUS=1
 if [ -z "$RUSTUP_TOOLCHAIN" ]; then
-  cargo +nightly clippy -- -D warnings || STATUS=1
+  cargo +nightly clippy --tests -- -D warnings || STATUS=1
 else
-  cargo clippy -- -D warnings || STATUS=1
+  cargo clippy --tests -- -D warnings || STATUS=1
 fi
 exit $STATUS
