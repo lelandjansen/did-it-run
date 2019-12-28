@@ -11,8 +11,8 @@ use winrt::windows::ui::notifications::{
 };
 
 #[cfg(all(target_os = "windows", not(test)))]
-const TOAST_ID: &str =
-r"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe";
+#[rustfmt::skip]
+const TOAST_ID: &str = r"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe";
 
 #[derive(Debug)]
 pub enum DesktopError {
