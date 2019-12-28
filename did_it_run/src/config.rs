@@ -413,11 +413,8 @@ mod test {
             timeout: Some(10),
         };
         let file_config: UserConfig = Default::default();
-        let merged = merge(
-            cli_config.clone(),
-            file_config.clone(),
-            MergeOptions::default(),
-        );
+        let merged =
+            merge(cli_config.clone(), file_config, MergeOptions::default());
         assert_eq!(merged, cli_config);
 
         let file_config = UserConfig {
@@ -445,10 +442,10 @@ mod test {
         };
         let expected = UserConfig {
             version: cli_config.version.clone(),
-            desktop_notifications: cli_config.desktop_notifications.clone(),
+            desktop_notifications: cli_config.desktop_notifications,
             email: file_config.email.clone(),
-            validate: cli_config.validate.clone(),
-            timeout: file_config.timeout.clone(),
+            validate: cli_config.validate,
+            timeout: file_config.timeout,
         };
         let merged = merge(cli_config, file_config, MergeOptions::default());
         assert_eq!(merged, expected);

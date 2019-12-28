@@ -335,8 +335,7 @@ mod test {
             .unwrap()
             .subparts
             .iter()
-            .filter(|part| part.ctype.mimetype == mimetype)
-            .next()
+            .find(|part| part.ctype.mimetype == mimetype)
             .unwrap()
             .get_body()
             .unwrap()
@@ -428,7 +427,7 @@ mod test {
             .with_addr(server_address)
             .unwrap();
         let handle = server.serve().unwrap();
-        let mailer = Mailer::new(config.clone(), credentials);
+        let mailer = Mailer::new(config, credentials);
         handle.stop();
         assert!(mailer.is_ok());
         assert_eq!(auth_success_receiver.iter().count(), 0);
@@ -458,7 +457,7 @@ mod test {
             .with_addr(server_address)
             .unwrap();
         let handle = server.serve().unwrap();
-        let mailer = Mailer::new(config.clone(), credentials);
+        let mailer = Mailer::new(config, credentials);
         handle.stop();
         assert!(mailer.is_err());
         assert_matches!(mailer.unwrap_err(), MailerError::SmtpError(_));
@@ -492,7 +491,7 @@ mod test {
             .unwrap();
         let handle = server.serve().unwrap();
 
-        let mut mailer = Mailer::new(config.clone(), credentials).unwrap();
+        let mut mailer = Mailer::new(config, credentials).unwrap();
         let result = mailer.dispatch_notification(NOTIFICATION_INFO.clone());
         handle.stop();
 
@@ -532,7 +531,7 @@ mod test {
         // We cannot expect_err because native_tls::Certificate does not
         // implement fmt::Debug
         let bad_certificate =
-            native_tls::Certificate::from_pem("bad certificate".as_bytes());
+            native_tls::Certificate::from_pem(b"bad certificate");
         let tls_err = match bad_certificate {
             Ok(_) => panic!("Did not produce native_tls error."),
             Err(err) => err,
@@ -549,7 +548,7 @@ mod test {
         // We cannot expect_err because native_tls::Certificate does not
         // implement fmt::Debug
         let bad_certificate =
-            native_tls::Certificate::from_pem("bad certificate".as_bytes());
+            native_tls::Certificate::from_pem(b"bad certificate");
         let tls_err = match bad_certificate {
             Ok(_) => panic!("Did not produce native_tls error."),
             Err(err) => err,
@@ -576,7 +575,7 @@ mod test {
         // We cannot expect_err because native_tls::Certificate does not
         // implement fmt::Debug
         let bad_certificate =
-            native_tls::Certificate::from_pem("bad certificate".as_bytes());
+            native_tls::Certificate::from_pem(b"bad certificate");
         let tls_err = match bad_certificate {
             Ok(_) => panic!("Did not produce native_tls error."),
             Err(err) => err,
