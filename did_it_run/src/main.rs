@@ -76,9 +76,8 @@ mod test {
     lazy_static! {
         static ref PROJECT_ROOT_NAME: OsString = OsString::from("did-it-run");
         pub static ref PROJECT_ROOT_PATH: PathBuf = {
-            let pwd =
+            let mut path =
                 env::current_dir().expect("Current directory not available.");
-            let mut path = PathBuf::from(pwd);
             // Heuristic: Use a unique set of file names contained in the
             // project's root folder to identify it.
             let root_folder_files_sample: HashSet<_> =
