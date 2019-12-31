@@ -1,3 +1,4 @@
+binop_separator = "Back"
 condense_wildcard_suffixes = true
 edition = "2018"
 error_on_line_overflow = true
