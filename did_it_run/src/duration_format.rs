@@ -81,9 +81,9 @@ mod test {
         assert_eq!(duration_format(&secs(SECONDS_PER_DAY)), "1d 0h 0m");
         assert_eq!(
             duration_format(&secs(
-                3 * SECONDS_PER_DAY
-                    + 14 * SECONDS_PER_HOUR
-                    + 16 * SECONDS_PER_MINUTE
+                3 * SECONDS_PER_DAY +
+                    14 * SECONDS_PER_HOUR +
+                    16 * SECONDS_PER_MINUTE
             )),
             "3d 14h 16m"
         );
