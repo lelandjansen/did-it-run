@@ -9,29 +9,29 @@ authors = ["Leland Jansen <hello@lelandjansen.com>"]
 edition = "2018"
 
 [dependencies]
-clap = "~2.33.0"
+clap = "2.33.0"
 common = { path = "../common" }
-dirs = "~2.0.2"
-lazy_static = "~1.4.0"
+dirs = "2.0.2"
+lazy_static = "1.4.0"
 native-tls = "^0.2" # Match lettre dependency
-semver = "~0.9.0"
-serde = "~1.0.104"
-serde_derive = "~1.0.104"
-toml = "~0.5.5"
+semver = "0.9.0"
+serde = "1.0.104"
+serde_derive = "1.0.104"
+toml = "0.5.5"
 
-# TODO(#19): lettre = "~0.10.0"
+# TODO(#19): lettre = "0.10.0"
 [dependencies.lettre]
 git = "https://github.com/lettre/lettre/"
 rev = "0ead3cde09a02918e3976aa442329fe247f05c55"
 
-# TODO(#19): lettre_email = "~0.10.0"
+# TODO(#19): lettre_email = "0.10.0"
 [dependencies.lettre_email]
 git = "https://github.com/lettre/lettre/"
 rev = "0ead3cde09a02918e3976aa442329fe247f05c55"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 glib = "^0.4.0" # Match libnotify dependency
-libnotify = "~1.0.3"
+libnotify = "1.0.3"
 
 [target.'cfg(target_os = "macos")'.dependencies.mac-notification-sys]
 # TODO(#31): Upgrade mac-notification-sys when/if Failure error handling is
@@ -39,13 +39,13 @@ libnotify = "~1.0.3"
 git = "https://github.com/h4llow3En/mac-notification-sys"
 
 [target.'cfg(target_os = "windows")'.dependencies.winrt]
-version = "~0.5.1"
+version = "0.5.1"
 features = ["windows-data", "windows-ui"]
 
 [dev-dependencies]
-matches = "~0.1.8"
-mailin-embedded = "~0.4.1"
-mailparse = "~0.10.1"
+matches = "0.1.8"
+mailin-embedded = "0.4.1"
+mailparse = "0.10.1"
 
 [[bin]]
 name = "diditrun"
