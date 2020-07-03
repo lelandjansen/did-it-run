@@ -13,7 +13,7 @@ use lettre::smtp::{ClientSecurity, SmtpClient, SmtpTransport};
 use lettre::Transport;
 use lettre_email::{self, EmailBuilder};
 use native_tls::{self, Protocol, TlsConnector};
-use serde_derive::Deserialize;
+use serde::Deserialize;
 use std::convert::From;
 use std::error;
 use std::fmt;

@@ -1,8 +1,7 @@
 use crate::notifications::email::{EmailConfig, SmtpCredentials};
 use lazy_static::lazy_static;
 use semver::{SemVerError, Version};
-use serde::de::DeserializeOwned;
-use serde_derive::Deserialize;
+use serde::{de::DeserializeOwned, Deserialize};
 use std::default::Default;
 use std::error;
 use std::fmt;
