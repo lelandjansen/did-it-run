@@ -9,7 +9,7 @@ authors = ["Leland Jansen <hello@lelandjansen.com>"]
 edition = "2018"
 
 [dependencies]
-clap = "2.33.0"
+clap = "2.33.2"
 common = { path = "../common" }
 dirs = "2.0.2"
 lazy_static = "1.4.0"
