@@ -45,7 +45,7 @@ features = ["windows-data", "windows-ui"]
 [dev-dependencies]
 matches = "0.1.8"
 mailin-embedded = "0.4.1"
-mailparse = "0.10.1"
+mailparse = "0.13.5"
 
 [[bin]]
 name = "diditrun"
